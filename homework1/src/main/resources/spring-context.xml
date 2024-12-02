@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:app.properties"/>
+
+
+    <bean id="questionService" class="org.micro.company.homework1.service.QuestionServiceImpl">
+        <constructor-arg name="questionFileName" value="${filename}"/>
+        <constructor-arg name="splitter" value=";"/>
+    </bean>
+
+    <bean id="ioService" class="org.micro.company.homework1.service.IOServiceImpl"/>
+
+    <bean id="testingService" class="org.micro.company.homework1.service.TestingServiceImpl">
+        <constructor-arg name="ioService" ref="ioService"/>
+        <constructor-arg name="questionService" ref="questionService"/>
+    </bean>
+</beans>
