@@ -8,7 +8,11 @@ import java.util.Scanner;
 @Service
 @RequiredArgsConstructor
 public class IOServiceImpl implements IOService {
-    private Scanner sc = new Scanner(System.in);
+    private final Scanner sc;
+
+    public IOServiceImpl() {
+        this.sc = new Scanner(System.in);
+    }
 
     @Override
     public String read() {

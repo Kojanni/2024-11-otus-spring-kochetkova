@@ -3,6 +3,7 @@ package org.micro.company.homework.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.micro.company.homework.domain.Person;
@@ -10,9 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Сервис регистрации пользователей")
 public class UserRegisterServiceImplTest {
 
     @InjectMocks
@@ -28,6 +29,7 @@ public class UserRegisterServiceImplTest {
     private MessageSource messageSource;
 
     @Test
+    @DisplayName("Пользователь регистрируется без предварительных данных")
     public void testRegisterUser_WithNullPerson() {
         Person person = Person.builder().firstName("Иван").lastName("Иванов").build();
         when(personDataService.savePerson(any(Person.class))).thenReturn(person);
@@ -40,6 +42,7 @@ public class UserRegisterServiceImplTest {
         verify(ioService, times(2)).read();
     }
     @Test
+    @DisplayName("Пользователь регистрируется с предварительными данными")
     public void testRegisterUser_WithExistingPerson() {
         Person person = Person.builder().firstName("Петр").lastName("Петров").build();
         when(personDataService.savePerson(person)).thenReturn(person);
@@ -53,6 +56,7 @@ public class UserRegisterServiceImplTest {
     }
 
     @Test
+    @DisplayName("Пользователь вводит данные через консоль")
     public void testRequestUserByConsole() {
         Person person = Person.builder().firstName("Иван").lastName("Иванов").build();
         when(messageSource.getMessage(any(), any(),any())).thenReturn("Введите имя:");

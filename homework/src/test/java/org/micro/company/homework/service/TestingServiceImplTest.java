@@ -1,6 +1,7 @@
 package org.micro.company.homework.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Сервис тестирования")
 class TestingServiceImplTest {
 
     @InjectMocks
@@ -38,11 +40,10 @@ class TestingServiceImplTest {
         question2 = new Question("Что такое OOP?",
                 Arrays.asList("Объектно-ориентированное программирование", "Процедурное программирование"),
                 1);
-
     }
 
-
     @Test
+    @DisplayName("Все верно")
     void runTests_CorrectAnswers() {
         when(questionService.getQuestions()).thenReturn(List.of(question1));
         when(ioService.readInt()).thenReturn(1);
@@ -54,6 +55,7 @@ class TestingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Все не верно")
     void runTests_IncorrectAnswers() {
         when(questionService.getQuestions()).thenReturn(List.of(question1, question2));
         when(ioService.readInt()).thenReturn(2).thenReturn(2);
@@ -65,6 +67,7 @@ class TestingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Верно половина")
     void runTests_SomeIncorrectAnswers() {
         when(questionService.getQuestions()).thenReturn(List.of(question1, question2));
         when(ioService.readInt()).thenReturn(2).thenReturn(1);
