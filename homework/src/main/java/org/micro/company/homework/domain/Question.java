@@ -1,4 +1,4 @@
-package org.micro.company.homework1.domain;
+package org.micro.company.homework.domain;
 
 
 import java.util.List;

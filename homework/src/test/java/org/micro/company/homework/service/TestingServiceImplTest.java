@@ -1,11 +1,11 @@
-package org.micro.company.homework1.service;
+package org.micro.company.homework.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.micro.company.homework1.domain.Question;
+import org.micro.company.homework.domain.Question;
 
 import java.util.Arrays;
 import java.util.List;

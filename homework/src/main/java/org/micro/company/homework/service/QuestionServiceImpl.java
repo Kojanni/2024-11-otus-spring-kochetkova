@@ -1,6 +1,6 @@
-package org.micro.company.homework1.service;
+package org.micro.company.homework.service;
 
-import org.micro.company.homework1.domain.Question;
+import org.micro.company.homework.domain.Question;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;

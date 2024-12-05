@@ -1,6 +1,6 @@
-package org.micro.company.homework1;
+package org.micro.company.homework;
 
-import org.micro.company.homework1.service.TestingService;
+import org.micro.company.homework.service.TestingService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Main {

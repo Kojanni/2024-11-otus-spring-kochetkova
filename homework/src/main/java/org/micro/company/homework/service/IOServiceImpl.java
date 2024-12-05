@@ -1,4 +1,4 @@
-package org.micro.company.homework1.service;
+package org.micro.company.homework.service;
 
 import java.util.Scanner;
 
