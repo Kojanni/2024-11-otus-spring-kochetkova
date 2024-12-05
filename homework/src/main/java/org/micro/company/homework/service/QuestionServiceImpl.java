@@ -1,6 +1,9 @@
 package org.micro.company.homework.service;
 
+import lombok.RequiredArgsConstructor;
 import org.micro.company.homework.domain.Question;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.*;
@@ -10,14 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class QuestionServiceImpl implements QuestionService {
-    public final String splitter;
-    private final String questionFileName;
-
-    public QuestionServiceImpl(String splitter, String questionFileName) {
-        this.splitter = splitter;
-        this.questionFileName = questionFileName;
-    }
+    @Value("${question.splitter}")
+    public String splitter;
+    @Value("${question.filename}")
+    private String questionFileName;
 
     @Override
     public List<Question> getQuestions() {

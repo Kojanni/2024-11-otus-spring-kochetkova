@@ -1,12 +1,14 @@
 package org.micro.company.homework.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.Scanner;
 
+@Service
+@RequiredArgsConstructor
 public class IOServiceImpl implements IOService {
     private Scanner sc = new Scanner(System.in);
-
-    public IOServiceImpl() {
-    }
 
     @Override
     public String read() {

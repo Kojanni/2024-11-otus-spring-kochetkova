@@ -1,17 +1,19 @@
 package org.micro.company.homework.service;
 
+import lombok.RequiredArgsConstructor;
+import org.micro.company.homework.domain.Person;
 import org.micro.company.homework.domain.Question;
+import org.micro.company.homework.domain.TestResult;
+import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class TestingServiceImpl implements TestingService {
     private final QuestionService questionService;
     private final IOService ioService;
-
-    public TestingServiceImpl(QuestionService questionService, IOService ioService) {
-        this.questionService = questionService;
-        this.ioService = ioService;
-    }
 
     @Override
     public int runTests() {
@@ -26,16 +28,8 @@ public class TestingServiceImpl implements TestingService {
             for (int i = 1; i <= question.getAnswers().size(); i++) {
                 ioService.write(i + ". " + question.getAnswers().get(i - 1));
             }
-            ioService.write("Введите номер ответа: ");
-            boolean answerType = false;
-            int answerIndex = 0;
-            while (!answerType) {
-                answerIndex = ioService.readInt();
-                if (answerIndex < 1 || answerIndex > question.getAnswers().size()) {
-                    answerType = false;
-                    ioService.write("Введите цифру от 1 до " + question.getAnswers().size());
-                } else answerType = true;
-            }
+            ioService.write("Введите номер ответа (цифру от 1 до " + question.getAnswers().size() + ")");
+            int answerIndex = ioService.readInt();
             if (answerIndex == question.getRightAnswer()) {
                 correctAnswers++;
             }
@@ -46,5 +40,16 @@ public class TestingServiceImpl implements TestingService {
         ioService.write("Тестирование закончено! Ваш результат: " + correctAnswers + "\\" + questions.size());
 
         return result;
+    }
+
+    @Override
+    public TestResult saveResult(Person user, int testResult) {
+        //тут типо  в БД сохранили
+        return TestResult.builder()
+                .id(1L)
+                .userId(user.getId())
+                .score(testResult)
+                .time(LocalDateTime.now())
+                .build();
     }
 }

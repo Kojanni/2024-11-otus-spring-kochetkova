@@ -1,13 +1,15 @@
 package org.micro.company.homework;
 
-import org.micro.company.homework.service.TestingService;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.micro.company.homework.config.AppConfig;
+import org.micro.company.homework.service.TestSystemService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {
     public static void main(String[] args) {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring-context.xml");
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 
-        TestingService runnerService = context.getBean(TestingService.class);
-        runnerService.runTests();
+        TestSystemService testSystemService = context.getBean(TestSystemService.class);
+        testSystemService.startToTest();
     }
 }
