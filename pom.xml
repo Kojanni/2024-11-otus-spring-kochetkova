@@ -21,10 +21,10 @@
 	<developers>
 		<developer/>
 	</developers>
-    <modules>
-        <module>homerwork</module>
-    </modules>
-    <scm>
+	<modules>
+		<module>tester</module>
+	</modules>
+	<scm>
 		<connection/>
 		<developerConnection/>
 		<tag/>
