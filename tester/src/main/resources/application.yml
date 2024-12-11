@@ -4,7 +4,7 @@ spring:
   messages:
     basename: i18n.messages
   jackson:
-    locale: ru
+    locale: ${LOCALE:en}
 question:
-  filename: ${QUESTION_FILENAME:questions.csv}
+  basefilename: question.questions
   splitter: ${QUESTION_SPLITTER:;}

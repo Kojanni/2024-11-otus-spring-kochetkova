@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -19,14 +20,18 @@ import java.util.Arrays;
 public class QuestionServiceImpl implements QuestionService {
     @Value("${question.splitter}")
     public String splitter;
-    @Value("${question.filename}")
-    private String questionFileName;
+    @Value("${question.basefilename}")
+    private String baseFileName;
+    @Value("${spring.jackson.locale:}")
+    private String locale;
 
     @Override
     public List<QuestionData> getQuestions() {
         List<QuestionData> questionDataList = new ArrayList<>();
         try {
-            File file = ResourceUtils.getFile("classpath:" + questionFileName);
+
+            File file = ResourceUtils.getFile("classpath:" + String.join("\\", baseFileName.split("\\.")) +
+                    (StringUtils.hasText(locale) ? "_" + locale : "") + ".csv");
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             String line;
 
