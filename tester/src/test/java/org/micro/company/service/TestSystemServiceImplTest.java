@@ -7,6 +7,7 @@ import org.micro.company.domain.Person;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,12 +18,16 @@ class TestSystemServiceImplTest {
 
     @InjectMocks
     private TestSystemServiceImpl testSystemService;
-
     @Mock
     private TestingService testingService;
-
     @Mock
     private UserRegisterService userRegisterService;
+    @Mock
+    private UserLocaleResolver userLocaleResolver;
+    @Mock
+    private IOService ioService;
+    @Mock
+    private MessageSource messageSource;
 
 
     @Test

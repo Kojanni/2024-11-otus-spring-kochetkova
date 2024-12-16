@@ -1,10 +1,14 @@
 spring:
   application:
     name: ${SERVICE_NAME:2024-11-otus-spring-kochetkova}
-  messages:
-    basename: i18n.messages
+
   jackson:
     locale: ${LOCALE:en}
+
+  messages:
+    basename: i18n.messages
+  locale:
+    default: wtweret
 question:
   basefilename: question.questions
   splitter: ${QUESTION_SPLITTER:;}
