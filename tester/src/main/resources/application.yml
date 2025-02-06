@@ -1,9 +1,11 @@
 spring:
   application:
     name: ${SERVICE_NAME:2024-11-otus-spring-kochetkova}
-
+  shell:
+    interactive:
+      enabled: true
   jackson:
-    locale: ${LOCALE:en}
+    locale: ${LOCALE:ru}
 
   messages:
     basename: i18n.messages

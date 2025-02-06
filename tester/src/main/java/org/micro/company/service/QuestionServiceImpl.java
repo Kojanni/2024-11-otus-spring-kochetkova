@@ -1,5 +1,6 @@
 package org.micro.company.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.micro.company.domain.QuestionData;
 
 import java.util.ArrayList;
@@ -17,19 +18,21 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class QuestionServiceImpl implements QuestionService {
+    private final UserLocaleResolver userLocaleResolver;
+
     @Value("${question.splitter}")
     public String splitter;
     @Value("${question.basefilename}")
     private String baseFileName;
-    @Value("${spring.jackson.locale:}")
-    private String locale;
+
 
     @Override
     public List<QuestionData> getQuestions() {
         List<QuestionData> questionDataList = new ArrayList<>();
         try {
-
+            String locale = userLocaleResolver.getLocale();
             File file = ResourceUtils.getFile("classpath:" + String.join("\\", baseFileName.split("\\.")) +
                     (StringUtils.hasText(locale) ? "_" + locale : "") + ".csv");
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
@@ -50,7 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
                 questionDataList.add(questionData);
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            log.error(e.getMessage());
         }
         return questionDataList;
     }

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.micro.company.domain.QuestionData;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -20,6 +22,9 @@ class QuestionServiceImplTest {
     @InjectMocks
     private QuestionServiceImpl questionService;
 
+    @Mock
+    private UserLocaleResolver userLocaleResolver;
+
     private final String splitter = ";";
     private final String baseFileName = "questions";
 
@@ -32,6 +37,8 @@ class QuestionServiceImplTest {
     @Test
     @DisplayName("Получен список вопросов")
     void testGetQuestions() {
+        Mockito.when(userLocaleResolver.getLocale()).thenReturn("ru");
+
         List<QuestionData> questions = questionService.getQuestions();
 
         assertNotNull(questions);
@@ -45,6 +52,8 @@ class QuestionServiceImplTest {
     @Test
     @DisplayName("Ссылка на вопросы не отработала")
     void testGetQuestions_FileNotFound() {
+        Mockito.when(userLocaleResolver.getLocale()).thenReturn("ru");
+
         ReflectionTestUtils.setField(questionService, "baseFileName", "");
 
         List<QuestionData> questions = questionService.getQuestions();

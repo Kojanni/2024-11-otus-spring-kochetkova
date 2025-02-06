@@ -22,6 +22,18 @@ public class UserRegisterServiceImpl implements UserRegisterService {
     }
 
     @Override
+    public Person registerUser(String firstName, String lastName) {
+        Person person = Person.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .build();
+        if (person == null) {
+            person = requestUserByConsole();
+        }
+        return personDataService.savePerson(person);
+    }
+
+    @Override
     public Person requestUserByConsole() {
         ioService.write(messageSource.getMessage(
                 "registration_input_firstname",
