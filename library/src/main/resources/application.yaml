@@ -1,0 +1,16 @@
+Spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=library
+    username: postgres
+    password: 123456
+  sql:
+    init:
+      schema-locations: schema.sql
+      data-locations: data.sql
+      mode: always
+  shell:
+    script:
+      enabled: true
+    interactive:
+      enabled: true
