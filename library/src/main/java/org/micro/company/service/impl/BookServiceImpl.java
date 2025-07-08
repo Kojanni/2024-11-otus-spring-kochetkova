@@ -9,6 +9,7 @@ import org.micro.company.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookEntity findById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Try to find book by null id");
@@ -33,6 +35,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookEntity> findByAuthor(AuthorEntity author) {
         if (author == null) {
             return new ArrayList<>();
@@ -42,6 +45,7 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
+    @Transactional
     public BookEntity saveBook(String title, AuthorEntity author, GenreEntity genre) {
         try {
             return bookDao.findByTitleAndAuthor(title, author);
@@ -55,6 +59,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         if (id == null) {
             return;
@@ -63,6 +68,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public long count() {
         return bookDao.count();
     }

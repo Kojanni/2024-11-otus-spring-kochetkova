@@ -4,13 +4,22 @@ Spring:
     url: jdbc:postgresql://localhost:5432/postgres?currentSchema=library
     username: postgres
     password: 123456
-  sql:
-    init:
-      schema-locations: schema.sql
-      data-locations: data.sql
-      mode: always
+
   shell:
     script:
       enabled: true
     interactive:
       enabled: true
+  jpa:
+    show-sql: true
+    generate-ddl: false
+#    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+#      ddl-auto: create-drop
+
+  sql:
+    init:
+      mode: always
+      schema-locations: schema.sql
+      data-locations: data.sql

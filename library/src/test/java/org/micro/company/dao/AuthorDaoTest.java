@@ -7,8 +7,9 @@ import org.micro.company.dao.impl.AuthorDaoImpl;
 import org.micro.company.dto.AuthorEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
@@ -18,25 +19,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Dao для работы с авторами")
-@JdbcTest
+@DataJpaTest
 @ActiveProfiles("test")
+@Import(AuthorDaoImpl.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class AuthorDaoTest {
 
     @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private TestEntityManager testEntityManager;
 
+    @Autowired
     private AuthorDao authorDao;
 
     AuthorEntity author1;
     AuthorEntity author2;
+    Long author1Id = 1L;
+    Long author2Id = 2L;
 
     @BeforeEach
     void setUp() {
-        authorDao = new AuthorDaoImpl(jdbcTemplate);
-
-        author1 = AuthorEntity.builder().id(1L).name("Константин").middleName("Михайлович").surname("Симонов").build();
-        author2 = AuthorEntity.builder().id(2L).name("Антон").middleName("Павлович").surname("Чехов").build();
+        author1 = testEntityManager.find(AuthorEntity.class, author1Id);
+        author2 = testEntityManager.find(AuthorEntity.class, author2Id);
     }
 
     @Test
@@ -45,12 +48,14 @@ class AuthorDaoTest {
 
         List<AuthorEntity> result = authorDao.findAll();
 
-        assertThat(result).containsAll(authors);
+        assertThat(result).usingRecursiveComparison()
+                .ignoringCollectionOrder()
+                .isEqualTo(authors);
     }
 
     @Test
-    void testFindByFullName() {
-        AuthorEntity result = authorDao.findByFullName(author1.getSurname(), author1.getName(), author1.getMiddleName());
+    void testFind() {
+        AuthorEntity result = authorDao.find(author1.getSurname(), author1.getName(), author1.getMiddleName());
 
         assertNotNull(result);
         assertThat(result).usingRecursiveComparison()
@@ -58,8 +63,8 @@ class AuthorDaoTest {
     }
 
     @Test
-    void testFindByFullNameNotFound() {
-        AuthorEntity result = authorDao.findByFullName("Doe", "John", "Middle");
+    void testFindNotFound() {
+        AuthorEntity result = authorDao.find("Doe", "John", "Middle");
 
         assertNull(result);
     }

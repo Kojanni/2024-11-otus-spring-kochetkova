@@ -47,20 +47,20 @@ class AuthorServiceTest {
         String fullName = "Smith John";
         AuthorEntity expectedAuthor = AuthorEntity.builder().name("John").surname("Smith").build();
 
-        when(authorDao.findByFullName("Smith", "John", null)).thenReturn(expectedAuthor);
+        when(authorDao.find("Smith", "John", null)).thenReturn(expectedAuthor);
 
         AuthorEntity result = authorService.findByFullName(fullName);
 
         assertNotNull(result);
         assertEquals(expectedAuthor, result);
-        verify(authorDao, times(1)).findByFullName("Smith", "John", null);
+        verify(authorDao, times(1)).find("Smith", "John", null);
     }
 
     @Test
     void testFindByFullName_WhenAuthorDoesNotExist() {
         String fullName = "Doe Jane";
 
-        when(authorDao.findByFullName("Doe", "Jane", null)).thenReturn(null);
+        when(authorDao.find("Doe", "Jane", null)).thenReturn(null);
         when(authorDao.save(any(AuthorEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AuthorEntity result = authorService.findByFullName(fullName);
@@ -69,7 +69,7 @@ class AuthorServiceTest {
         assertEquals("Doe", result.getSurname());
         assertEquals("Jane", result.getName());
         assertNull(result.getMiddleName());
-        verify(authorDao, times(1)).findByFullName("Doe", "Jane", null);
+        verify(authorDao, times(1)).find("Doe", "Jane", null);
         verify(authorDao, times(1)).save(any(AuthorEntity.class));
     }
 

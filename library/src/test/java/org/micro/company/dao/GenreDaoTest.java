@@ -7,37 +7,39 @@ import org.micro.company.dao.impl.GenreDaoImpl;
 import org.micro.company.dto.GenreEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Dao для работы с книгами")
-@JdbcTest
+@DisplayName("Dao для работы с жанрами")
+@DataJpaTest
 @ActiveProfiles("test")
+@Import(GenreDaoImpl.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class GenreDaoTest {
 
     @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private TestEntityManager testEntityManager;
 
+    @Autowired
     private GenreDao genreDao;
 
     GenreEntity genre1;
+    Long genre1Id = 1L;
     GenreEntity genre2;
+    Long genre2Id = 2L;
 
     @BeforeEach
     void setUp() {
-        genreDao = new GenreDaoImpl(jdbcTemplate);
-
-        genre1 = GenreEntity.builder().id(1L).name("Военный роман").build();
-        genre2 = GenreEntity.builder().id(2L).name("Комедия").build();
+        genre1 = testEntityManager.find(GenreEntity.class, genre1Id);
+        genre2 = testEntityManager.find(GenreEntity.class, genre2Id);
     }
 
     @Test
@@ -64,8 +66,7 @@ class GenreDaoTest {
 
         GenreEntity result = genreDao.findByName(newGenre);
 
-        assertNotNull(result);
-        assertEquals(newGenre, result.getName());
+        assertNull(result);
     }
 
     @Test

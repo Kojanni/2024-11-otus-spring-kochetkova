@@ -7,7 +7,7 @@ values
     ('Детектив');
 
 insert into author
-    (name, middleName, surname)
+    (name, middle_name, surname)
 values
     ('Константин', 'Михайлович', 'Симонов'),
     ('Антон', 'Павлович', 'Чехов'),
@@ -15,7 +15,7 @@ values
     ('Артур', 'Игнейшус', 'Конан Дойл');
 
 insert into book
-    (title, genreId, authorId)
+    (title, genre_id, author_id)
 values
     ('Живые и мёртвые', 1, 1),
     ('Солдатами не рождаются', 1, 1),

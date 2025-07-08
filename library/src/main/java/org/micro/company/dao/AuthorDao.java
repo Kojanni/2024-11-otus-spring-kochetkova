@@ -7,7 +7,8 @@ import java.util.List;
 public interface AuthorDao {
 
     List<AuthorEntity> findAll();
-    AuthorEntity findByFullName(String surname, String name, String middleName);
+
+    AuthorEntity find(String surname, String name, String middleName);
 
     AuthorEntity save(AuthorEntity author);
 }

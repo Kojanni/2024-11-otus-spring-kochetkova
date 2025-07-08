@@ -9,8 +9,9 @@ import org.micro.company.dto.BookEntity;
 import org.micro.company.dto.GenreEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 
@@ -21,39 +22,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Dao для работы с книгами")
-@JdbcTest
+@DataJpaTest
 @ActiveProfiles("test")
+@Import(BookDaoImpl.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class BookDaoTest {
 
     @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private TestEntityManager testEntityManager;
 
+    @Autowired
     private BookDao bookDao;
 
     private static final int EXPECTED_BOOKS_COUNT = 2;
 
     BookEntity book1;
     BookEntity book2;
+    Long book1Id = 1L;
+    Long book2Id = 2L;
 
     GenreEntity genre1;
-    GenreEntity genre2;
+    Long genre1Id = 1L;
 
     AuthorEntity author1;
     AuthorEntity author2;
+    Long author1Id = 1L;
+    Long author2Id = 2L;
 
     @BeforeEach
     void setUp() {
-        bookDao = new BookDaoImpl(jdbcTemplate);
+        author1 = testEntityManager.find(AuthorEntity.class, author1Id);
+        author2 = testEntityManager.find(AuthorEntity.class, author2Id);
 
-        author1 = AuthorEntity.builder().id(1L).name("Константин").middleName("Михайлович").surname("Симонов").build();
-        author2 = AuthorEntity.builder().id(2L).name("Антон").middleName("Павлович").surname("Чехов").build();
+        book1 = testEntityManager.find(BookEntity.class, book1Id);
+        book2 = testEntityManager.find(BookEntity.class, book2Id);
 
-        genre1 = GenreEntity.builder().id(1L).name("Военный роман").build();
-        genre2 = GenreEntity.builder().id(2L).name("Комедия").build();
-
-        book1 = BookEntity.builder().id(1L).author(author1).genre(genre1).title("Живые и мёртвые").build();
-        book2 = BookEntity.builder().id(2L).author(author2).genre(genre2).title("Вишнёвый сад").build();
+        genre1 = testEntityManager.find(GenreEntity.class, genre1Id);
     }
 
     @DisplayName("возращать правильное количество книг")
@@ -92,7 +96,7 @@ class BookDaoTest {
 
         List<BookEntity> actualBooks = bookDao.findAll();
 
-        assertThat(actualBooks).containsAll(books);
+        assertThat(actualBooks).usingRecursiveComparison()
+                .isEqualTo(books);
     }
-
 }
