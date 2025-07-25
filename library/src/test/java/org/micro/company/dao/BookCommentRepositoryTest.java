@@ -3,7 +3,6 @@ package org.micro.company.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.micro.company.dao.impl.BookCommentDaoImpl;
 import org.micro.company.dto.AuthorEntity;
 import org.micro.company.dto.BookCommentEntity;
 import org.micro.company.dto.BookEntity;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -23,15 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DisplayName("Dao для работы с авторами")
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(BookCommentDaoImpl.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class BookCommentDaoTest {
+class BookCommentRepositoryTest {
 
     @Autowired
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private BookCommentDao bookCommentDao;
+    private BookCommentRepository bookCommentRepository;
 
     BookCommentEntity bookComment1;
     BookCommentEntity bookComment2;
@@ -65,7 +62,7 @@ class BookCommentDaoTest {
     @Test
     @DisplayName("получать по Id")
     void testFindById() {
-        Optional<BookCommentEntity> comment = bookCommentDao.findById(bookComment1.getId());
+        Optional<BookCommentEntity> comment = bookCommentRepository.findById(bookComment1.getId());
 
         assertThat(comment).isNotEmpty().usingRecursiveComparison()
                 .ignoringFields("value.book.author.books", "value.book.genre")
@@ -74,7 +71,7 @@ class BookCommentDaoTest {
 
     @Test
     void testFindByAuthor() {
-        List<BookCommentEntity> comments = bookCommentDao.findBookCommentsByAuthor(author1);
+        List<BookCommentEntity> comments = bookCommentRepository.findByAuthor(author1);
 
         assertNotNull(comments);
         assertThat(comments).usingRecursiveComparison()
@@ -84,7 +81,7 @@ class BookCommentDaoTest {
 
     @Test
     void testFindByBook() {
-        List<BookCommentEntity> comments = bookCommentDao.findBookCommentsByBook(book2);
+        List<BookCommentEntity> comments = bookCommentRepository.findByBook(book2);
 
         assertNotNull(comments);
         assertThat(comments).usingRecursiveComparison()
@@ -96,7 +93,7 @@ class BookCommentDaoTest {
     void testSave() {
         BookCommentEntity comment = BookCommentEntity.builder().author(author2).book(book1).comment("NEW").build();
 
-        BookCommentEntity result = bookCommentDao.save(comment);
+        BookCommentEntity result = bookCommentRepository.save(comment);
 
         assertThat(result).usingRecursiveComparison()
                 .ignoringFields("id")

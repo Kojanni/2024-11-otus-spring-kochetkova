@@ -5,6 +5,7 @@ import org.micro.company.dto.BookEntity;
 import org.micro.company.dto.GenreEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookService {
 
@@ -12,7 +13,7 @@ public interface BookService {
 
     List<BookEntity> findByAuthor(AuthorEntity author);
 
-    BookEntity findById(Long id);
+    Optional<BookEntity> findById(Long id);
 
     BookEntity saveBook(String title, AuthorEntity author, GenreEntity genre);
 

@@ -7,12 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.micro.company.service.impl.GenreServiceImpl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.micro.company.dao.GenreDao;
+import org.micro.company.dao.GenreRepository;
 import org.micro.company.dto.GenreEntity;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.*;
 class GenreServiceTest {
 
     @Mock
-    private GenreDao genreDao;
+    private GenreRepository genreRepository;
 
     @InjectMocks
     private GenreServiceImpl genreService;
@@ -40,39 +41,39 @@ class GenreServiceTest {
     void testFindAll() {
         List<GenreEntity> genres = Arrays.asList(genre1, genre2);
 
-        when(genreDao.findAll()).thenReturn(genres);
+        when(genreRepository.findAll()).thenReturn(genres);
 
         List<GenreEntity> result = genreService.findAll();
 
         assertEquals(2, result.size());
         assertEquals(genre1.getName(), result.get(0).getName());
         assertEquals(genre2.getName(), result.get(1).getName());
-        verify(genreDao, times(1)).findAll();
+        verify(genreRepository, times(1)).findAll();
     }
 
     @Test
     void testFindByName_ExistingGenre() {
         String genreName = genre1.getName();
 
-        when(genreDao.findByName(genreName)).thenReturn(genre1);
+        when(genreRepository.findByName(genreName)).thenReturn(Optional.of(genre1));
 
-        GenreEntity result = genreService.findByName(genreName);
+        var result = genreService.findByName(genreName);
 
-        assertNotNull(result);
-        assertEquals(genre1, result);
-        verify(genreDao, times(1)).findByName(genreName);
+        assertTrue(result.isPresent());
+        assertEquals(genre1, result.get());
+        verify(genreRepository, times(1)).findByName(genreName);
     }
 
     @Test
     void testFindByName_NonExistingGenre() {
         String genreName = "Fantasy";
 
-        when(genreDao.findByName(genreName)).thenReturn(null);
+        when(genreRepository.findByName(genreName)).thenReturn(Optional.empty());
 
-        GenreEntity result = genreService.findByName(genreName);
+        var result = genreService.findByName(genreName);
 
-        assertNull(result);
-        verify(genreDao, times(1)).findByName(genreName);
+        assertFalse(result.isPresent());
+        verify(genreRepository, times(1)).findByName(genreName);
     }
 
     @Test
@@ -80,12 +81,12 @@ class GenreServiceTest {
         String genreName = "Science Fiction";
         GenreEntity savedGenre = GenreEntity.builder().name(genreName).build();
 
-        when(genreDao.save(any(GenreEntity.class))).thenReturn(savedGenre);
+        when(genreRepository.save(any(GenreEntity.class))).thenReturn(savedGenre);
 
         GenreEntity result = genreService.save(genreName);
 
         assertNotNull(result);
         assertEquals(genreName, result.getName());
-        verify(genreDao, times(1)).save(any(GenreEntity.class));
+        verify(genreRepository, times(1)).save(any(GenreEntity.class));
     }
 }

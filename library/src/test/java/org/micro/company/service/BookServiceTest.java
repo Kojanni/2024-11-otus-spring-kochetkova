@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.micro.company.dao.BookDao;
+import org.micro.company.dao.BookRepository;
 import org.micro.company.dto.AuthorEntity;
 import org.micro.company.dto.BookEntity;
 import org.micro.company.dto.GenreEntity;
@@ -12,9 +12,9 @@ import org.micro.company.service.impl.BookServiceImpl;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 class BookServiceTest {
 
     @Mock
-    private BookDao bookDao;
+    private BookRepository bookRepository;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -56,27 +56,27 @@ class BookServiceTest {
     void testFindAll() {
         List<BookEntity> books = Arrays.asList(book1, book2);
 
-        when(bookDao.findAll()).thenReturn(books);
+        when(bookRepository.findAll()).thenReturn(books);
 
         List<BookEntity> result = bookService.findAll();
 
         assertEquals(2, result.size());
         assertEquals(book1.getTitle(), result.get(0).getTitle());
         assertEquals(book2.getTitle(), result.get(1).getTitle());
-        verify(bookDao, times(1)).findAll();
+        verify(bookRepository, times(1)).findAll();
     }
 
     @Test
     void testFindById_ValidId() {
         Long id = 1L;
 
-        when(bookDao.findById(id)).thenReturn(book1);
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book1));
 
-        BookEntity result = bookService.findById(id);
+        Optional<BookEntity> result = bookService.findById(id);
 
-        assertNotNull(result);
-        assertEquals(book1, result);
-        verify(bookDao, times(1)).findById(id);
+        assertTrue(result.isPresent());
+        assertEquals(book1, result.get());
+        verify(bookRepository, times(1)).findById(id);
     }
 
     @Test
@@ -88,15 +88,15 @@ class BookServiceTest {
 
     @Test
     void testFindByAuthor_ValidAuthor() {
-        List<BookEntity> books = Arrays.asList(book1);
+        List<BookEntity> books = Collections.singletonList(book1);
 
-        when(bookDao.findByAuthor(author1)).thenReturn(books);
+        when(bookRepository.findByAuthor(author1)).thenReturn(books);
 
         List<BookEntity> result = bookService.findByAuthor(author1);
 
         assertEquals(1, result.size());
         assertEquals(book1.getTitle(), result.get(0).getTitle());
-        verify(bookDao, times(1)).findByAuthor(author1);
+        verify(bookRepository, times(1)).findByAuthor(author1);
     }
 
     @Test
@@ -104,21 +104,21 @@ class BookServiceTest {
         List<BookEntity> result = bookService.findByAuthor(null);
 
         assertTrue(result.isEmpty());
-        verify(bookDao, never()).findByAuthor(any());
+        verify(bookRepository, never()).findByAuthor(any());
     }
 
     @Test
     void testSaveBook_WhenBookExists() {
         String title = book1.getTitle();
 
-        when(bookDao.findByTitleAndAuthor(title, author1)).thenReturn(book1);
+        when(bookRepository.findByTitleAndAuthor(title, author1)).thenReturn(Optional.of(book1));
 
         BookEntity result = bookService.saveBook(title, author1, genre1);
 
         assertNotNull(result);
         assertEquals(book1, result);
-        verify(bookDao, times(1)).findByTitleAndAuthor(title, author1);
-        verify(bookDao, never()).save(any());
+        verify(bookRepository, times(1)).findByTitleAndAuthor(title, author1);
+        verify(bookRepository, never()).save(any());
     }
 
     @Test
@@ -127,8 +127,8 @@ class BookServiceTest {
         BookEntity newBook = BookEntity.builder().title(title).author(author2).genre(genre2).build();
         BookEntity newBookSaved = BookEntity.builder().id(3L).title(title).author(author2).genre(genre2).build();
 
-        when(bookDao.findByTitleAndAuthor(title, author2)).thenThrow(new EmptyResultDataAccessException(1));
-        when(bookDao.save(newBook)).thenReturn(newBookSaved);
+        when(bookRepository.findByTitleAndAuthor(title, author2)).thenReturn(Optional.empty());
+        when(bookRepository.save(newBook)).thenReturn(newBookSaved);
 
         BookEntity result = bookService.saveBook(title, author2, genre2);
 
@@ -136,8 +136,8 @@ class BookServiceTest {
         assertEquals(title, result.getTitle());
         assertEquals(author2, result.getAuthor());
         assertEquals(genre2, result.getGenre());
-        verify(bookDao, times(1)).findByTitleAndAuthor(title, author2);
-        verify(bookDao, times(1)).save(any(BookEntity.class));
+        verify(bookRepository, times(1)).findByTitleAndAuthor(title, author2);
+        verify(bookRepository, times(1)).save(any(BookEntity.class));
     }
 
     @Test
@@ -146,24 +146,24 @@ class BookServiceTest {
 
         bookService.deleteById(id);
 
-        verify(bookDao, times(1)).deleteById(id);
+        verify(bookRepository, times(1)).deleteById(id);
     }
 
     @Test
     void testDeleteById_NullId() {
         bookService.deleteById(null);
 
-        verify(bookDao, never()).deleteById(any());
+        verify(bookRepository, never()).deleteById(any());
     }
 
     @Test
     void testCount() {
         long expectedCount = 5L;
-        when(bookDao.count()).thenReturn(expectedCount);
+        when(bookRepository.count()).thenReturn(expectedCount);
 
         long result = bookService.count();
 
         assertEquals(expectedCount, result);
-        verify(bookDao, times(1)).count();
+        verify(bookRepository, times(1)).count();
     }
 }

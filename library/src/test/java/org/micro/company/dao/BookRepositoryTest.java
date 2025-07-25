@@ -3,7 +3,6 @@ package org.micro.company.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.micro.company.dao.impl.BookDaoImpl;
 import org.micro.company.dto.AuthorEntity;
 import org.micro.company.dto.BookEntity;
 import org.micro.company.dto.GenreEntity;
@@ -11,28 +10,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Dao для работы с книгами")
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(BookDaoImpl.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class BookDaoTest {
+class BookRepositoryTest {
 
     @Autowired
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private BookDao bookDao;
+    private BookRepository bookRepository;
 
     private static final int EXPECTED_BOOKS_COUNT = 2;
 
@@ -63,7 +62,7 @@ class BookDaoTest {
     @DisplayName("возращать правильное количество книг")
     @Test
     void testReturnCorrectBookCount() {
-        assertThat(bookDao.count()).isEqualTo(EXPECTED_BOOKS_COUNT);
+        assertThat(bookRepository.count()).isEqualTo(EXPECTED_BOOKS_COUNT);
     }
 
     @DisplayName("добавлять книгу в БД")
@@ -71,7 +70,7 @@ class BookDaoTest {
     void testInsertBook() {
         BookEntity book = BookEntity.builder().author(author1).genre(genre1).title("Гордый человек").build();
 
-        BookEntity bookSaved = bookDao.save(book);
+        BookEntity bookSaved = bookRepository.save(book);
 
         assertNotNull(bookSaved);
         assertThat(bookSaved).usingRecursiveComparison()
@@ -82,10 +81,10 @@ class BookDaoTest {
     @DisplayName("получать нужную книгу по Id")
     @Test
     void testReturnCorrectBookById() {
-        BookEntity result = bookDao.findById(book1.getId());
+        Optional<BookEntity> result = bookRepository.findById(book1.getId());
 
-        assertNotNull(result);
-        assertThat(result).usingRecursiveComparison()
+        assertTrue(result.isPresent());
+        assertThat(result.get()).usingRecursiveComparison()
                 .isEqualTo(book1);
     }
 
@@ -94,7 +93,7 @@ class BookDaoTest {
     void testReturnCorrectBookList() {
         List<BookEntity> books = Arrays.asList(book1, book2);
 
-        List<BookEntity> actualBooks = bookDao.findAll();
+        List<BookEntity> actualBooks = bookRepository.findAll();
 
         assertThat(actualBooks).usingRecursiveComparison()
                 .isEqualTo(books);

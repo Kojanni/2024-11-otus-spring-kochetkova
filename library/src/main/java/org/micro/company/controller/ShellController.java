@@ -36,8 +36,8 @@ public class ShellController {
     public void saveBook() {
         ioService.write("Введите жанр");
         String genreName = ioService.read();
-        GenreEntity genre = genreService.findByName(genreName);
-        if (genre == null) {
+        Optional<GenreEntity> genre = genreService.findByName(genreName);
+        if (genre.isEmpty()) {
             ioService.write("Genre \"" + genreName + "\" not found. Book can't be saved.");
             return;
         }
@@ -45,8 +45,8 @@ public class ShellController {
         ioService.write("Введите ФИО автора");
         String authorFullName = ioService.read();
 
-        AuthorEntity author = authorService.findByFullName(authorFullName);
-        if (author == null) {
+        Optional<AuthorEntity> author = authorService.findByFullName(authorFullName);
+        if (author.isEmpty()) {
             ioService.write("Author \"" + genreName + "\" not found. Book can't be saved.");
             return;
         }
@@ -54,7 +54,7 @@ public class ShellController {
         ioService.write("Введите наименование книги");
         String title = ioService.read();
 
-        Optional.ofNullable(bookService.saveBook(title, author, genre)).ifPresentOrElse(
+        Optional.ofNullable(bookService.saveBook(title, author.get(), genre.get())).ifPresentOrElse(
                 book -> ioService.write(book.toString()),
                 () -> ioService.write("Book \"" + title + "\" not found.")
         );
@@ -70,12 +70,19 @@ public class ShellController {
 
     @ShellMethod(key = {"findBookByAuthor", "f a b"}, value = "Find books by author")
     public void findBookListByAuthor(@ShellOption(help = "The author FullName to find") String authorFullName) {
-        AuthorEntity author = authorService.findByFullName(authorFullName);
-
-        Optional.ofNullable(bookService.findByAuthor(author)).ifPresentOrElse(
-                book -> ioService.write(book.toString()),
-                () -> ioService.write("Book with author " + authorFullName + " not found.")
+        Optional<AuthorEntity> authorEntity = authorService.findByFullName(authorFullName);
+        authorEntity.ifPresentOrElse(
+                author -> {
+                    List<BookEntity> books = bookService.findByAuthor(author);
+                    if (!books.isEmpty()) {
+                        ioService.write(books.toString());
+                    } else {
+                        ioService.write("Book with author " + authorFullName + " not found.");
+                    }
+                },
+                () -> ioService.write("Author " + authorFullName + " not existed in library.")
         );
+
     }
 
     @ShellMethod(key = {"deleteBookById", "d id b"}, value = "Delete book by Id")

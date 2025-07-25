@@ -1,37 +1,37 @@
 package org.micro.company.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.micro.company.dao.BookDao;
+import org.micro.company.dao.BookRepository;
 import org.micro.company.dto.AuthorEntity;
 import org.micro.company.dto.BookEntity;
 import org.micro.company.dto.GenreEntity;
 import org.micro.company.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookServiceImpl implements BookService {
 
-    private final BookDao bookDao;
+    private final BookRepository bookRepository;
 
     @Override
     public List<BookEntity> findAll() {
-        return bookDao.findAll();
+        return bookRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BookEntity findById(Long id) {
+    public Optional<BookEntity> findById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Try to find book by null id");
         }
-        return bookDao.findById(id);
+        return bookRepository.findById(id);
     }
 
     @Override
@@ -40,22 +40,19 @@ public class BookServiceImpl implements BookService {
         if (author == null) {
             return new ArrayList<>();
         }
-        return bookDao.findByAuthor(author);
+        return bookRepository.findByAuthor(author);
     }
 
 
     @Override
     @Transactional
     public BookEntity saveBook(String title, AuthorEntity author, GenreEntity genre) {
-        try {
-            return bookDao.findByTitleAndAuthor(title, author);
-        } catch (EmptyResultDataAccessException e) {
-            return bookDao.save(BookEntity.builder()
-                    .title(title)
-                    .author(author)
-                    .genre(genre)
-                    .build());
-        }
+        Optional<BookEntity> book = bookRepository.findByTitleAndAuthor(title, author);
+        return book.orElseGet(() -> bookRepository.save(BookEntity.builder()
+                .title(title)
+                .author(author)
+                .genre(genre)
+                .build()));
     }
 
     @Override
@@ -64,12 +61,12 @@ public class BookServiceImpl implements BookService {
         if (id == null) {
             return;
         }
-        bookDao.deleteById(id);
+        bookRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
     public long count() {
-        return bookDao.count();
+        return bookRepository.count();
     }
 }

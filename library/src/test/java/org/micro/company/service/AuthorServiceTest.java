@@ -3,7 +3,7 @@ package org.micro.company.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.micro.company.dao.AuthorDao;
+import org.micro.company.dao.AuthorRepository;
 import org.micro.company.dto.AuthorEntity;
 import org.micro.company.service.impl.AuthorServiceImpl;
 import org.mockito.InjectMocks;
@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -24,7 +25,7 @@ class AuthorServiceTest {
     private AuthorServiceImpl authorService;
 
     @Mock
-    private AuthorDao authorDao;
+    private AuthorRepository authorRepository;
 
     @Test
     void testFindAll() {
@@ -32,14 +33,14 @@ class AuthorServiceTest {
         AuthorEntity author2 = AuthorEntity.builder().name("Jane").middleName("Ann").surname("Doe").build();
         List<AuthorEntity> authors = Arrays.asList(author1, author2);
 
-        when(authorDao.findAll()).thenReturn(authors);
+        when(authorRepository.findAll()).thenReturn(authors);
 
         List<AuthorEntity> result = authorService.findAll();
 
         assertEquals(2, result.size());
         assertEquals("Smith", result.get(0).getSurname());
         assertEquals("Doe", result.get(1).getSurname());
-        verify(authorDao, times(1)).findAll();
+        verify(authorRepository, times(1)).findAll();
     }
 
     @Test
@@ -47,37 +48,34 @@ class AuthorServiceTest {
         String fullName = "Smith John";
         AuthorEntity expectedAuthor = AuthorEntity.builder().name("John").surname("Smith").build();
 
-        when(authorDao.find("Smith", "John", null)).thenReturn(expectedAuthor);
+        when(authorRepository.findBySurnameAndNameAndMiddleName("Smith", "John", null))
+                .thenReturn(Optional.of(expectedAuthor));
 
-        AuthorEntity result = authorService.findByFullName(fullName);
+        Optional<AuthorEntity> result = authorService.findByFullName(fullName);
 
-        assertNotNull(result);
-        assertEquals(expectedAuthor, result);
-        verify(authorDao, times(1)).find("Smith", "John", null);
+        assertTrue(result.isPresent());
+        assertEquals(expectedAuthor, result.get());
+        verify(authorRepository, times(1)).findBySurnameAndNameAndMiddleName("Smith", "John", null);
     }
 
     @Test
     void testFindByFullName_WhenAuthorDoesNotExist() {
         String fullName = "Doe Jane";
 
-        when(authorDao.find("Doe", "Jane", null)).thenReturn(null);
-        when(authorDao.save(any(AuthorEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(authorRepository.findBySurnameAndNameAndMiddleName("Doe", "Jane", null))
+                .thenReturn(Optional.empty());
 
-        AuthorEntity result = authorService.findByFullName(fullName);
+        Optional<AuthorEntity> result = authorService.findByFullName(fullName);
 
-        assertNotNull(result);
-        assertEquals("Doe", result.getSurname());
-        assertEquals("Jane", result.getName());
-        assertNull(result.getMiddleName());
-        verify(authorDao, times(1)).find("Doe", "Jane", null);
-        verify(authorDao, times(1)).save(any(AuthorEntity.class));
+        assertFalse(result.isPresent());
+        verify(authorRepository, times(1)).findBySurnameAndNameAndMiddleName("Doe", "Jane", null);
     }
 
     @Test
     void testSave() {
         AuthorEntity newAuthor = AuthorEntity.builder().name("Charlie").middleName("David").surname("Brown").build();
 
-        when(authorDao.save(any(AuthorEntity.class))).thenReturn(newAuthor);
+        when(authorRepository.save(any(AuthorEntity.class))).thenReturn(newAuthor);
 
         AuthorEntity result = authorService.save("Brown", "Charlie", "David");
 
@@ -85,6 +83,6 @@ class AuthorServiceTest {
         assertEquals("Brown", result.getSurname());
         assertEquals("Charlie", result.getName());
         assertEquals("David", result.getMiddleName());
-        verify(authorDao, times(1)).save(any(AuthorEntity.class));
+        verify(authorRepository, times(1)).save(any(AuthorEntity.class));
     }
 }

@@ -3,6 +3,14 @@ package org.micro.company.dto;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+@NamedEntityGraph(
+        name = "book.author.genre",
+        attributeNodes = {
+                @NamedAttributeNode("author"),
+                @NamedAttributeNode("genre")
+        }
+)
 @Data
 @Builder
 @NoArgsConstructor
